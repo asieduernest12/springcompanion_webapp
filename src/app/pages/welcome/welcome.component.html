@@ -1,0 +1,113 @@
+<h1>Spring Companion Hybrid</h1>
+
+<nz-tabset [(nzSelectedIndex)]="selected_index">
+  <nz-tab nzTitle="History">
+    <div id="history">
+      <ul nz-list nzBordered nzSize="large">
+        <li
+          nz-list-item
+          *ngFor="let word of words | async"
+          (click)="loadWord(word, 1)"
+        >
+          <ul ng-list-item-actions>
+            <li nz-list-item-action>
+              <a>{{ word.word | uppercase }}</a>
+            </li>
+          </ul>
+          {{ word.meanings.length }} meanings
+        </li>
+      </ul>
+    </div>
+  </nz-tab>
+
+  <nz-tab nzTitle="Word Details">
+    <div id="word-details">
+      <h2>{{ selected_word?.word ?? "nothing selected"  }}</h2>
+      <span>Language: {{ selected_word?.language ?? "nothing selected"  }}</span>
+
+    
+      <nz-list>
+        <strong class='bold' #meaningsList>Meaning</strong>
+        <nz-list-item *ngFor="let meaning of selected_word?.meanings">
+          <nz-list nzHeader="{{meaning.meaning.toUpperCase()}}" nzFooter="">
+            <nz-list-item *ngFor="let sentence of meaning.sentences">{{sentence}}</nz-list-item>
+          </nz-list>
+          
+        </nz-list-item>
+      </nz-list>
+      
+    </div>
+  </nz-tab>
+  <nz-tab nzTitle="Random word">
+    <div id="random-word-cmp">
+      <h3>Random word</h3>
+
+      <span id="word">Word</span>
+
+      <span>Meaning options</span>
+      <div class="input-group">
+        <label for="opt1"
+          >Options meaning 1
+          <input
+            type="radio"
+            name="random-option"
+            id="opt1"
+            value="meaning1"
+            readonly
+          />
+        </label>
+        <label for="opt2"
+          >Options meaning 1
+          <input
+            type="radio"
+            name="random-option"
+            id="opt2"
+            value="meaning1"
+            readonly
+          />
+        </label>
+        <label for="opt3"
+          >Options meaning 1
+          <input
+            type="radio"
+            name="random-option"
+            id="opt3"
+            value="meaning1"
+            readonly
+          />
+        </label>
+        <label for="opt4"
+          >Options meaning 1
+          <input
+            type="radio"
+            name="random-option"
+            id="opt4"
+            value="meaning1"
+            readonly
+          />
+        </label>
+      </div>
+    </div>
+  </nz-tab>
+  <nz-tab nzTitle="Disclaimer">
+    <div id="disclaimer">
+      <h2>
+        The information presented in this application is meant for personal and
+        should not be relied upon professional or legal activities
+      </h2>
+    </div>
+  </nz-tab>
+  <nz-tab nzTitle="Profile">
+    <div id="profile">
+      <h2>Profile</h2>
+
+      <div id="Random settings">
+        <h3>Random settings</h3>
+      </div>
+
+      <div id="sync_settings">
+        <h3>Sync settings</h3>
+      </div>
+    </div>
+  </nz-tab>
+</nz-tabset>

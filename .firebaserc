@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "springcompanion": {
+      "hosting": {
+        "mobile-app": [
+          "springcompanion"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "springcompanion"
+  }
+}
