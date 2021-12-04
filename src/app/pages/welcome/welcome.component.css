@@ -4,3 +4,14 @@
     gap: 0.8rem;
 }
 
+.random_question_header {
+    margin-top: 1.6rem;
+}
+
+#form_random_option__submit {
+    margin-top: 1.6rem;
+}
+
+#form_random_option__submit .submission_icon {
+    margin-left: 0.8rem;
+}

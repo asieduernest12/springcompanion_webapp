@@ -11,7 +11,7 @@
         >
           <ul ng-list-item-actions>
             <li nz-list-item-action>
-              <a>{{ word.word | uppercase }}</a>
+              <a>{{ word?.word }}</a>
             </li>
           </ul>
           {{ word.meanings.length }} meanings
@@ -22,80 +22,67 @@
 
   <nz-tab nzTitle="Word Details">
     <div id="word-details">
-      <h2>{{ selected_word?.word ?? "nothing selected"  }}</h2>
-      <span>Language: {{ selected_word?.language ?? "nothing selected"  }}</span>
+      <h2>{{ selected_word?.word ?? "nothing selected" }}</h2>
+      <span>Language: {{ selected_word?.language ?? "nothing selected" }}</span>
 
-    
       <nz-list>
-        <strong class='bold' #meaningsList>Meaning</strong>
+        <strong class="bold" #meaningsList>Meaning</strong>
         <nz-list-item *ngFor="let meaning of selected_word?.meanings">
-          <nz-list nzHeader="{{meaning.meaning.toUpperCase()}}" nzFooter="">
-            <nz-list-item *ngFor="let sentence of meaning.sentences">{{sentence}}</nz-list-item>
+          <nz-list nzHeader="{{ meaning.meaning.toUpperCase() }}" nzFooter="">
+            <nz-list-item *ngFor="let sentence of meaning.sentences">{{
+              sentence
+            }}</nz-list-item>
           </nz-list>
-          
         </nz-list-item>
       </nz-list>
-      
     </div>
   </nz-tab>
+
   <nz-tab nzTitle="Random word">
     <div id="random-word-cmp">
-      <h3>Random word</h3>
+      <button nz-button nzType="default" (click)="randomWordEngine()">
+        Get a word
+      </button>
 
-      <span id="word">Word</span>
+      <form nz-form  (ngSubmit)="submitRandomForm($event, random_question)" nzLayout="vertical" #form_random_option='ngForm' nzGutter="48">
+        <div class='random_question_header'>
+          <strong id="word">{{ random_question.word }} </strong> means ?
+          <span class="submission_icon" *ngIf="random_question.submitted">
+            <i nz-icon nzType="check-circle" nzTheme="outline" *ngIf="random_question?.is_correct ?? false"></i>
+            <i nz-icon nzType="close-circle" nzTheme="outline" *ngIf="!random_question?.is_correct ?? false"></i>
+          </span> 
+        </div>
+  
+        <nz-radio-group nz-row nzGutter="32" class="input-group"  [(ngModel)]="random_question.submission" name='submission' [required]="true">
+          <span nz-col nzSpan="24">options</span>
+          <div
+            nz-col
+            nzSpan="24"
+            *ngFor="let meaning_option of random_question.random_meanings"
+          >
+            <label nz-radio nzValue="{{meaning_option}}" [nzDisabled]="random_question.submitted">{{ meaning_option }}</label>
+          </div>
+        </nz-radio-group>
+        
+        <button id='form_random_option__submit' nz-button nzType='primary' type='submit' [disabled]="form_random_option.invalid || random_question.submitted">
+          Check Answer 
+        </button>
+      </form>
 
-      <span>Meaning options</span>
-      <div class="input-group">
-        <label for="opt1"
-          >Options meaning 1
-          <input
-            type="radio"
-            name="random-option"
-            id="opt1"
-            value="meaning1"
-            readonly
-          />
-        </label>
-        <label for="opt2"
-          >Options meaning 1
-          <input
-            type="radio"
-            name="random-option"
-            id="opt2"
-            value="meaning1"
-            readonly
-          />
-        </label>
-        <label for="opt3"
-          >Options meaning 1
-          <input
-            type="radio"
-            name="random-option"
-            id="opt3"
-            value="meaning1"
-            readonly
-          />
-        </label>
-        <label for="opt4"
-          >Options meaning 1
-          <input
-            type="radio"
-            name="random-option"
-            id="opt4"
-            value="meaning1"
-            readonly
-          />
-        </label>
-      </div>
     </div>
   </nz-tab>
+
   <nz-tab nzTitle="Disclaimer">
     <div id="disclaimer">
       <h2>
-        The information presented in this application is meant for personal and
-        should not be relied upon professional or legal activities
+        The information presented in this application is meant for personal use and should be considered 'as is' and
+        <br>It is not intended for profession or legal use
       </h2>
     </div>
+  </nz-tab>
+
+  <nz-tab nzTitle='Performance'>
+    <h2>Last 7 days</h2>
   </nz-tab>
   <nz-tab nzTitle="Profile">
     <div id="profile">
