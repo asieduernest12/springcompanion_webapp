@@ -24,7 +24,7 @@ import { WelcomeComponent } from './welcome.component';
     NzRadioModule,
     NzGridModule,
     FormsModule,
-    NzIconModule
+    NzIconModule,
   ],
   declarations: [WelcomeComponent],
   exports: [WelcomeComponent],

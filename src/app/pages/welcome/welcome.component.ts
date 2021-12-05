@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+
 import {
   Firestore,
   collectionData,
@@ -15,6 +16,7 @@ import {
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { Observable } from 'rxjs';
 import { FormGroup, FormsModule } from '@angular/forms';
+
 
 interface Meaning {
   meaning: String;
@@ -58,6 +60,7 @@ export class WelcomeComponent implements OnInit {
     this.user = this.firestore.doc('users/t5T6rO3NCEbLJQZfj5st');
     this.words = this.user.collection<Word>('words').valueChanges();
     this.random_question = this.initializeRandomQuestion();
+   
     console.log(this.words);
   }
 
@@ -174,5 +177,10 @@ export class WelcomeComponent implements OnInit {
       result.add(_array[this.randomLessThan(_array.length)]);
 
     return <any>[...result.values()];
+  }
+
+  // add point to chart serie
+  add() {
+    // this.chart.addPoint(Math.floor(Math.random() * 10));
   }
 }

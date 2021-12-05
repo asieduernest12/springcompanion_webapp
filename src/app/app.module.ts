@@ -40,10 +40,10 @@ registerLocaleData(en);
     NzTabsModule,
     NzListModule,
     NzRadioModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule,
     // provideFirebaseApp(() => initializeApp(environment.firebase)),
     // provideFirestore(() => getFirestore()),
-    AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule
 
   ],
   providers: [{ provide: NZ_I18N, useValue: en_US }],

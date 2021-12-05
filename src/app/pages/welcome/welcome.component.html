@@ -72,17 +72,12 @@
     </div>
   </nz-tab>
 
-  <nz-tab nzTitle="Disclaimer">
-    <div id="disclaimer">
-      <h2>
-        The information presented in this application is meant for personal use and should be considered 'as is' and
-        <br>It is not intended for profession or legal use
-      </h2>
-    </div>
-  </nz-tab>
-
+  
   <nz-tab nzTitle='Performance'>
     <h2>Last 7 days</h2>
+
+    <button (click)="add()">Add Point!</button>
+    
   </nz-tab>
   <nz-tab nzTitle="Profile">
     <div id="profile">
@@ -97,4 +92,14 @@
       </div>
     </div>
   </nz-tab>
+
+  <nz-tab nzTitle="Disclaimer">
+    <div id="disclaimer">
+      <h2>
+        The information presented in this application is meant for personal use and should be considered 'as is' and
+        <br>It is not intended for profession or legal use
+      </h2>
+    </div>
+  </nz-tab>
+
 </nz-tabset>
