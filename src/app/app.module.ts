@@ -21,6 +21,10 @@ import { environment } from '../environments/environment';
 import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+
 
 registerLocaleData(en);
 
@@ -40,6 +44,10 @@ registerLocaleData(en);
     NzTabsModule,
     NzListModule,
     NzRadioModule,
+    NzSwitchModule,
+    NzSpaceModule,
+    NzDatePickerModule,
+
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     // provideFirebaseApp(() => initializeApp(environment.firebase)),

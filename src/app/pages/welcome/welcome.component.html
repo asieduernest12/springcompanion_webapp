@@ -40,44 +40,110 @@
 
   <nz-tab nzTitle="Random word">
     <div id="random-word-cmp">
-      <button nz-button nzType="default" (click)="randomWordEngine()">
-        Get a word
-      </button>
+      <div nz-row nzDirection="horizontal" nzJustify="space-between">
+        <button nz-button nzType="default" (click)="randomWordEngine()">
+          Get a word
+        </button>
 
-      <form nz-form  (ngSubmit)="submitRandomForm($event, random_question)" nzLayout="vertical" #form_random_option='ngForm' nzGutter="48">
-        <div class='random_question_header'>
+        <div class="random__dating" nz-col nzSpan="12">
+          <form nzLayout="horizontal" nzLayout="horizontal">
+            <nz-form-item nz-row>
+              <nz-form-label
+                nzFor="use_fixed_marked_at"
+                nzSpan="1-24"
+                nzRequired
+                >Used fixed marked_at</nz-form-label
+              >
+              <nz-form-control nzSpan="1-24">
+                <nz-switch
+                  [(ngModel)]="use_fixed_marked_at"
+                  name="use_fixed_marked_at"
+                ></nz-switch>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item nz-row>
+              <nz-form-label nzFor="sim_marked_at" nzSpan="12" nzRequired
+                >Set marked</nz-form-label
+              >
+              <nz-form-control nzSpan="12">
+                <nz-date-picker
+                  [(ngModel)]="sim_marked_at"
+                  name="sim_marked_at"
+                  nzPlaceHolder="Please select data"
+                  [nzDisabled]="!use_fixed_marked_at"
+                ></nz-date-picker>
+              </nz-form-control>
+            </nz-form-item>
+          </form>
+        </div>
+      </div>
+
+      <form
+        nz-form
+        (ngSubmit)="submitRandomForm($event, random_question)"
+        nzLayout="vertical"
+        #form_random_option="ngForm"
+        nzGutter="48"
+      >
+        <div class="random_question_header">
           <strong id="word">{{ random_question.word }} </strong> means ?
           <span class="submission_icon" *ngIf="random_question.submitted">
-            <i nz-icon nzType="check-circle" nzTheme="outline" *ngIf="random_question?.is_correct ?? false"></i>
-            <i nz-icon nzType="close-circle" nzTheme="outline" *ngIf="!random_question?.is_correct ?? false"></i>
-          </span> 
+            <i
+              nz-icon
+              nzType="check-circle"
+              nzTheme="outline"
+              *ngIf="random_question?.is_correct ?? false"
+            ></i>
+            <i
+              nz-icon
+              nzType="close-circle"
+              nzTheme="outline"
+              *ngIf="!random_question?.is_correct ?? false"
+            ></i>
+          </span>
         </div>
-  
-        <nz-radio-group nz-row nzGutter="32" class="input-group"  [(ngModel)]="random_question.submission" name='submission' [required]="true">
+
+        <nz-radio-group
+          nz-row
+          nzGutter="32"
+          class="input-group"
+          [(ngModel)]="random_question.submission"
+          name="submission"
+          [required]="true"
+        >
           <span nz-col nzSpan="24">options</span>
           <div
             nz-col
             nzSpan="24"
             *ngFor="let meaning_option of random_question.random_meanings"
           >
-            <label nz-radio nzValue="{{meaning_option}}" [nzDisabled]="random_question.submitted">{{ meaning_option }}</label>
+            <label
+              nz-radio
+              nzValue="{{ meaning_option }}"
+              [nzDisabled]="random_question.submitted"
+              >{{ meaning_option }}</label
+            >
           </div>
         </nz-radio-group>
-        
-        <button id='form_random_option__submit' nz-button nzType='primary' type='submit' [disabled]="form_random_option.invalid || random_question.submitted">
-          Check Answer 
+
+        <button
+          id="form_random_option__submit"
+          nz-button
+          nzType="primary"
+          type="submit"
+          [disabled]="form_random_option.invalid || random_question.submitted"
+        >
+          Check Answer
         </button>
       </form>
-
     </div>
   </nz-tab>
 
-  
-  <nz-tab nzTitle='Performance'>
+  <nz-tab nzTitle="Performance">
     <h2>Last 7 days</h2>
 
-    <button (click)="add()">Add Point!</button>
-    
+    <button (click)="last7days()">Show last 7</button>
+    <div [chart]="chart"></div>
   </nz-tab>
   <nz-tab nzTitle="Profile">
     <div id="profile">
@@ -96,10 +162,10 @@
   <nz-tab nzTitle="Disclaimer">
     <div id="disclaimer">
       <h2>
-        The information presented in this application is meant for personal use and should be considered 'as is' and
-        <br>It is not intended for profession or legal use
+        The information presented in this application is meant for personal use
+        and should be considered 'as is' and
+        <br />It is not intended for profession or legal use
       </h2>
     </div>
   </nz-tab>
-
 </nz-tabset>

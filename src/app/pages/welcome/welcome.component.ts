@@ -14,9 +14,14 @@ import {
 } from '@angular/fire/compat/firestore';
 
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { FormGroup, FormsModule } from '@angular/forms';
 
+import { Chart } from 'angular-highcharts';
+
+import { addDays, format } from 'date-fns';
+import * as _ from 'lodash';
+import { Dictionary } from 'highcharts';
 
 interface Meaning {
   meaning: String;
@@ -35,9 +40,11 @@ interface RandomQuestion {
   submission?: String;
   submitted?: boolean;
   is_correct?: boolean;
-  created_at: String;
-  marked_at: String;
+  created_at: number;
+  marked_at: number | undefined;
 }
+const CORRECT_ANSWERS_INDEX = 3;
+const WRONG_ANSWERS_INDEX = 4;
 
 @Component({
   selector: 'app-welcome',
@@ -55,12 +62,19 @@ export class WelcomeComponent implements OnInit {
   random_option_radio_val: string = '';
   random_question: RandomQuestion;
   random_word: Word | undefined;
+  performance_sub: Subscription | undefined;
+  sim_marked_at: Date | undefined;
+  use_fixed_marked_at: boolean = false;
+
+  chart: Chart;
 
   constructor(private firestore: AngularFirestore) {
     this.user = this.firestore.doc('users/t5T6rO3NCEbLJQZfj5st');
     this.words = this.user.collection<Word>('words').valueChanges();
     this.random_question = this.initializeRandomQuestion();
-   
+    this.chart = this.makeChart([], []);
+    this.sim_marked_at = new Date();
+
     console.log(this.words);
   }
 
@@ -131,7 +145,9 @@ export class WelcomeComponent implements OnInit {
     //add to firestore random_evaluations
     this.user.collection('random_quizes').add({
       ...random_question,
-      marked_at: new Date().toISOString(),
+      marked_at: this.use_fixed_marked_at
+        ? this.sim_marked_at?.getTime()
+        : new Date().getTime(),
     });
   }
 
@@ -146,8 +162,8 @@ export class WelcomeComponent implements OnInit {
       random_meanings: [],
       word: '',
       submission: '',
-      created_at: new Date().toISOString(),
-      marked_at: '',
+      created_at: new Date().getTime(),
+      marked_at: undefined,
     };
   }
 
@@ -179,8 +195,154 @@ export class WelcomeComponent implements OnInit {
     return <any>[...result.values()];
   }
 
-  // add point to chart serie
-  add() {
-    // this.chart.addPoint(Math.floor(Math.random() * 10));
+  last7days() {
+    //stop if subscription exists
+    if (this.performance_sub) return;
+
+    console.log('subbing to answered_questions');
+
+    // milliseconds * seconds * minutes * hours * days
+    let _7days_in_ms = this.getMilliSeconds(60, 60, 24, 7);
+    let last_week_date = new Date(Date.now() - _7days_in_ms);
+    let last_week_ms = last_week_date.getTime();
+
+    this.performance_sub = this.user
+      .collection('random_quizes', (ref) =>
+        ref.orderBy('marked_at', 'desc').where('marked_at', '>', last_week_ms)
+      )
+      .valueChanges()
+      .subscribe((answered_questions) => {
+        answered_questions = answered_questions.map((q) => ({
+          ...q,
+          day_of_year: format(new Date(q.marked_at), 'EEE yyy-MM-dd'),
+        }));
+
+        let grouped_answered_questions: _.AnyKindOfDictionary = {
+          ...this.makeWeekFillers(last_week_date),
+          ..._.groupBy(answered_questions, (aq) => aq.day_of_year),
+        };
+
+        let data_series = Object.entries(grouped_answered_questions)
+          .map(
+            ([key, aq_group]): [
+              date_key: string,
+              totalQuestions: number,
+              timestamp: number,
+              answered_correct: number,
+              answered_wrong: number
+            ] => [
+              key,
+              aq_group.length,
+              new Date(key).getTime(),
+              aq_group.filter((q: RandomQuestion) => q.is_correct).length,
+              aq_group.filter((q: RandomQuestion) => !q.is_correct).length,
+            ]
+          )
+          .sort((a, b) => a[2] - b[2]);
+
+        let categories = data_series.map((data) => data[0]);
+
+        this.chart = this.makeChart(data_series, categories);
+        console.log(data_series);
+      });
+  }
+
+  private makeWeekFillers(last_week_date: Date) {
+    let result = {};
+
+    let i = 0;
+    while (i < 9) {
+      let next_date: Date = addDays(last_week_date, i++);
+      let key = format(next_date, 'EEE yyyy-MM-dd');
+      result = { ...result, ...{ [key]: [] } };
+    }
+
+    return result;
+  }
+
+  /**
+   * @param0 seconds
+   * @param1 minutes
+   * @param2 hours
+   * @param3 days
+   * @returns milliseconds total of the inputes provided
+   */
+  private getMilliSeconds(...time: Array<number>): number {
+    if (!time.length) throw new Error('provide');
+    return time.reduce(
+      (acc: number, partition: number) => acc * partition,
+      1000
+    );
+  }
+
+  private makeChart(
+    data_series: Array<
+      [
+        date_key: string,
+        totalQuestions: number,
+        timestamp: number,
+        answered_correct: number,
+        answered_wrong: number
+      ]
+    >,
+    categories: string[]
+  ): Chart {
+    return new Chart({
+      chart: {
+        type: 'line',
+      },
+      title: {
+        text: 'Past 7 days',
+      },
+      credits: {
+        enabled: false,
+      },
+      xAxis: [
+        {
+          categories: categories,
+        },
+      ],
+      tooltip: {
+        shared: true,
+      },
+      plotOptions: {
+        areaspline: {
+          fillOpacity: 0.5,
+        },
+      },
+
+      responsive: {
+        rules: [
+          {
+            condition: {
+              maxWidth: 500,
+            },
+            chartOptions: {
+              legend: {
+                enabled: false,
+              },
+            },
+          },
+        ],
+      },
+
+      series: [
+        {
+          name: 'Random Questions',
+          type: 'areaspline',
+          data: data_series,
+        },
+        {
+          name: 'Correctly Answered',
+          type: 'areaspline',
+          data: data_series.map((data) => data[CORRECT_ANSWERS_INDEX]),
+        },
+        {
+          name: 'Wrongly Answered',
+          type: 'areaspline',
+          data: data_series.map((data) => data[WRONG_ANSWERS_INDEX]),
+        },
+      ],
+    });
   }
 }
